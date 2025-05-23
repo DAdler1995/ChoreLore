@@ -1,0 +1,82 @@
+﻿@page "/QuestList"
+
+@using ChoreLore.Data
+@using Microsoft.AspNetCore.Identity
+@using Services.Interfaces
+@using Models
+@using System.Diagnostics
+
+@inject IChoreService ChoreService
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@rendermode InteractiveServer
+
+<PageTitle>Chore Lore Dashboard</PageTitle>
+
+<h1>Chore Lore Dashboard</h1>
+
+@if (chores == null)
+{
+    <p>Fetching quests...</p>
+}
+else
+{
+    <p>
+        <strong>Level:</strong> @user?.Level | <strong>Total XP:</strong> @user?.TotalXP
+    </p>
+
+    if (chores.Count == 0)
+    {
+        <p><strong>All Quests Complete! Huzzah!</strong></p>
+    }
+    else
+    {
+        <ul>
+            @foreach (var chore in chores)
+            {
+                <li title="@chore.Description">
+                    <strong>@chore.Name</strong> (@chore.Frequency): @chore.XP XP
+                    <button @onclick="@(() => CompleteChore(chore.Id))">Complete Quest!</button>
+                </li>
+            }
+        </ul>
+    }
+}
+
+
+
+@code
+{
+    private List<Chore>? chores;
+    private ApplicationUser? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authUser = authState.User;
+
+        var identityUser = await UserManager.GetUserAsync(authUser);
+        if (identityUser is ApplicationUser applicationUser)
+        {
+            user = applicationUser;
+            chores = await ChoreService.GetUserChoresAsync(applicationUser.Id);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/Account/Login");
+        }
+    }
+
+    private async Task CompleteChore(int choreId)
+    {
+        if (user != null)
+        {
+            await ChoreService.CompleteChoreAsync(choreId, user.Id);
+            user = await UserManager.FindByIdAsync(user.Id); // refresh XP & level
+            chores = await ChoreService.GetUserChoresAsync(user.Id); // refresh list
+            StateHasChanged();
+        }
+    }
+}

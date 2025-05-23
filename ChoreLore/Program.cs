@@ -1,6 +1,8 @@
 using ChoreLore.Components;
 using ChoreLore.Components.Account;
 using ChoreLore.Data;
+using ChoreLore.Services;
+using ChoreLore.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+builder.Services.AddScoped<IChoreService, ChoreService>();
 
 builder.Services.AddAuthentication(options =>
     {
