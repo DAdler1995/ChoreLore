@@ -6,9 +6,9 @@ namespace ChoreLore.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public required string Frequency { get; set; }
-        public required int XP { get; set; }
-        public required bool IsActive { get; set; }
+        public required string SimpleName { get; set; }
+        public required int TimesAWeek { get; set; }
+        public required int Gold { get; set; }
         public string Description { get; set; } = "";
 
         public string? UserId { get; set; }
@@ -19,7 +19,7 @@ namespace ChoreLore.Models
 
     public class ChoreCompletion
     {
-        public int Id{ get; set; }
+        public int Id { get; set; }
         public int? ChoreId { get; set; }
         public Chore? Chore { get; set; }
         public DateTime CompletionDate { get; set; } = DateTime.UtcNow;

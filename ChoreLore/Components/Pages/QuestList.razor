@@ -16,6 +16,7 @@
 <PageTitle>Chore Lore Dashboard</PageTitle>
 
 <h1>Chore Lore Dashboard</h1>
+<h2><strong>Total Gold:</strong> @user?.TotalGold gp</h2>
 
 @if (chores == null)
 {
@@ -23,10 +24,6 @@
 }
 else
 {
-    <p>
-        <strong>Level:</strong> @user?.Level | <strong>Total XP:</strong> @user?.TotalXP
-    </p>
-
     if (chores.Count == 0)
     {
         <p><strong>All Quests Complete! Huzzah!</strong></p>
@@ -36,9 +33,9 @@ else
         <ul>
             @foreach (var chore in chores)
             {
-                <li title="@chore.Description">
-                    <strong>@chore.Name</strong> (@chore.Frequency): @chore.XP XP
-                    <button @onclick="@(() => CompleteChore(chore.Id))">Complete Quest!</button>
+                <li title="(@chore.SimpleName) @chore.Description">
+                    <strong>@chore.Name</strong>: @chore.Gold gp
+                    <button @onclick="@(() => CompleteChore(chore.Id))">Complete Quest! (@chore.TimesAWeek)</button>
                 </li>
             }
         </ul>

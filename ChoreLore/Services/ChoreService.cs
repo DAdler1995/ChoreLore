@@ -1,4 +1,5 @@
 ﻿using ChoreLore.Data;
+using ChoreLore.Extensions;
 using ChoreLore.Models;
 using ChoreLore.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,22 @@ namespace ChoreLore.Services
 
         public async Task<List<Chore>> GetUserChoresAsync(string userId)
         {
-            return await _db.Chores.Where(x => x.UserId == userId && x.IsActive).ToListAsync();
+            var firstDateOfWeek = DateTime.UtcNow.StartOfWeek();
+            var lastDateOfWeek = DateTime.UtcNow.EndOfWeek();
+
+            // Query only chores for the user, and completion count in the current week
+            var chores = await _db.Chores
+                .Where(x => x.UserId == userId)
+                .Select(chore => new
+                {
+                    Chore = chore,
+                    CompletionCount = chore.Completions != null ? chore.Completions.Count(c => c.CompletionDate >= firstDateOfWeek && c.CompletionDate <= lastDateOfWeek) : 0 // Count the completions in the current week
+                })
+                .Where(x => x.CompletionCount < x.Chore.TimesAWeek)
+                .Select(x => x.Chore)
+                .ToListAsync();
+
+            return chores;
         }
 
         public async Task CompleteChoreAsync(int choreId, string userId)
@@ -33,16 +49,13 @@ namespace ChoreLore.Services
                 return;
             }
 
-            user.TotalXP += chore.XP;
-            user.Level = CalculateLevel(user.TotalXP);
-
             var completion = new ChoreCompletion
             {
                 ChoreId = choreId,
                 CompletionDate = DateTime.UtcNow
             };
 
-            chore.IsActive = false;
+            user.TotalGold += chore.Gold;
 
             _db.ChoreCompletions.Add(completion);
             await _db.SaveChangesAsync();
