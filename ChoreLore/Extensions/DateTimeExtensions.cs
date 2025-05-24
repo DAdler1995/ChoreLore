@@ -21,7 +21,7 @@
         public static DateTime EndOfWeek(this DateTime date)
         {
             var startOfWeek = StartOfWeek(date);
-            return startOfWeek.AddDays(6);
+            return startOfWeek.AddDays(7).AddMicroseconds(-1);
         }
     }
 }

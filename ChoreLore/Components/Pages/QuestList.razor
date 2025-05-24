@@ -1,6 +1,7 @@
 ﻿@page "/QuestList"
 
 @using ChoreLore.Data
+@using ChoreLore.Models.ViewModels
 @using Microsoft.AspNetCore.Identity
 @using Services.Interfaces
 @using Models
@@ -18,35 +19,62 @@
 <h1>Chore Lore Dashboard</h1>
 <h2><strong>Total Gold:</strong> @user?.TotalGold gp</h2>
 
-@if (chores == null)
-{
-    <p>Fetching quests...</p>
-}
-else
-{
-    if (chores.Count == 0)
-    {
-        <p><strong>All Quests Complete! Huzzah!</strong></p>
-    }
-    else
-    {
-        <ul>
-            @foreach (var chore in chores)
+<div class="container">
+    <div class="row">
+        @if (quests == null)
+        {
+            <p>Fetching quests...</p>
+        }
+        else
+        {
+            if (quests.Count == 0)
             {
-                <li title="(@chore.SimpleName) @chore.Description">
-                    <strong>@chore.Name</strong>: @chore.Gold gp
-                    <button @onclick="@(() => CompleteChore(chore.Id))">Complete Quest! (@chore.TimesAWeek)</button>
-                </li>
+                <p><strong>All Quests Complete! Huzzah!</strong></p>
             }
-        </ul>
-    }
-}
+            else
+            {
+                @foreach (var quest in quests)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card text-center h-100 @( quest.Completed ? "bg-success text-white" : "" )">
+                            <div class="card-header">
+                                <h3>@quest.Quest.Name</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"><strong>Gold:</strong> @quest.Quest.Gold gp</p>
+                                <p class="card-text"><strong>Times a Week:</strong> @quest.Quest.TimesAWeek</p>
+                                <p class="card-text"><strong>Completion Count:</strong> @quest.CompletionCount</p>
+                                <p class="card-text"><strong>Description:</strong> @quest.Quest.Description</p>
+                            </div>
+
+                            @if (quest.Completed)
+                            {
+                                <div class="card-footer">
+                                    <strong>Quest Completed!</strong>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="card-footer">
+                                    <button class="btn btn-primary" @onclick="@(() => CompleteChore(quest.Quest.Id))">Complete Quest!</button>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+
+
 
 
 
 @code
 {
-    private List<Chore>? chores;
+    private List<QuestViewModel>? quests;
     private ApplicationUser? user;
 
     protected override async Task OnInitializedAsync()
@@ -58,7 +86,7 @@ else
         if (identityUser is ApplicationUser applicationUser)
         {
             user = applicationUser;
-            chores = await ChoreService.GetUserChoresAsync(applicationUser.Id);
+            quests = await ChoreService.GetUserChoresAsync(applicationUser.Id);
         }
         else
         {
@@ -72,7 +100,7 @@ else
         {
             await ChoreService.CompleteChoreAsync(choreId, user.Id);
             user = await UserManager.FindByIdAsync(user.Id); // refresh XP & level
-            chores = await ChoreService.GetUserChoresAsync(user.Id); // refresh list
+            quests = await ChoreService.GetUserChoresAsync(user.Id); // refresh list
             StateHasChanged();
         }
     }
