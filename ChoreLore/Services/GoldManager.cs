@@ -8,7 +8,7 @@ namespace ChoreLore.Services
         private readonly ApplicationDbContext _db;
         private readonly string _userId;
 
-        public GoldManager(ApplicationDbContext db, string userId )
+        public GoldManager(ApplicationDbContext db, string userId)
         {
             _db = db;
             _userId = userId;

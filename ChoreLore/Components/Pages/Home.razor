@@ -1,7 +1,51 @@
 ﻿@page "/"
 
+@using ChoreLore.Data
+@using ChoreLore.Models
+@using ChoreLore.Services
+@using Microsoft.AspNetCore.Identity
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> UserManager
+@inject AccountStatisticService AccountStatisticService
+
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Welcome to Chore Lore!</h1>
+<h2>Track your chores, earn gold, and spend it on rewards!</h2>
 
-Welcome to your new app.
+<div class="container mt-4">
+    @if (user is null)
+    {
+        <p>Please login to view your stats.</p>
+        <a class="btn btn-outline-primary" href="Account/Login">Login!</a>
+    }
+    else
+    {
+        <h3>Hello, @user.UserName!</h3>
+        <p>Current Gold: @user.TotalGold</p>
+        @* <p>Total Quests Completed: @stats?.TotalQuestsCompleted ?? 0</p> *@
+        <p>Total Gold Earned: @stats?.TotalGoldEarned</p>
+}
+</div>
+
+
+
+@code
+{
+    private AccountStatistics? stats;
+    private ApplicationUser? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authUser = authState.User;
+
+        var identityUser = await UserManager.GetUserAsync(authUser);
+        if (identityUser is ApplicationUser applicationUser)
+        {
+            user = applicationUser;
+            stats = await AccountStatisticService.GetAccountStatisticsAsync(user.Id);
+        }
+    }
+}

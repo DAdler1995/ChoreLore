@@ -6,28 +6,26 @@ namespace ChoreLore.Services
     public class AccountStatisticService
     {
         private readonly ApplicationDbContext _db;
-        private readonly string _userId;
 
-        public AccountStatisticService(ApplicationDbContext db, string userId)
+        public AccountStatisticService(ApplicationDbContext db)
         {
             _db = db;
-            _userId = userId;
         }
 
-        public async Task<AccountStatistics?> GetAccountStatisticsAsync()
+        public async Task<AccountStatistics?> GetAccountStatisticsAsync(string userId)
         {
-            return await _db.AccountStatistics.FindAsync(_userId);
+            return await _db.AccountStatistics.FindAsync(userId);
         }
 
-        public async Task CreateNewUserStatisticEntryAsync()
+        public async Task CreateNewUserStatisticEntryAsync(string userId)
         {
-            var user = await _db.Users.FindAsync(_userId);
+            var user = await _db.Users.FindAsync(userId);
             if (user == null)
             {
                 return; // User not found
             }
 
-            var existingStats = await _db.AccountStatistics.FindAsync(_userId);
+            var existingStats = await _db.AccountStatistics.FindAsync(userId);
             if (existingStats != null)
             {
                 return; // User statistics already exist
@@ -35,7 +33,7 @@ namespace ChoreLore.Services
 
             var newStats = new AccountStatistics
             {
-                UserId = _userId,
+                UserId = userId,
                 TotalGoldEarned = 0,
                 TotalGoldSpent = 0
             };
