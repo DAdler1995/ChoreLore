@@ -4,6 +4,7 @@ using ChoreLore.Models;
 using ChoreLore.Models.ViewModels;
 using ChoreLore.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace ChoreLore.Services
 {
@@ -41,8 +42,8 @@ namespace ChoreLore.Services
 
         public async Task CompleteChoreAsync(int choreId, string userId)
         {
-            var chore = await _db.Chores.FindAsync(choreId);
-            if (chore == null || chore.UserId != userId)
+            var chore = await _db.Chores.Include(x => x.Completions).FirstOrDefaultAsync(x => x.Id == choreId);
+            if (chore == null || chore.UserId != userId || chore.Completions == null)
             {
                 return;
             }
@@ -59,38 +60,17 @@ namespace ChoreLore.Services
                 CompletionDate = DateTime.UtcNow
             };
 
-            user.TotalGold += chore.Gold;
-
             _db.ChoreCompletions.Add(completion);
             await _db.SaveChangesAsync();
-        }
 
-        public async Task<int> GetChoreCompletionCountAsync(int choreId)
-        {
-            var completionCount = await _db.ChoreCompletions.CountAsync(x => x.ChoreId == choreId);
-            return completionCount;
-        }
-
-        public async Task<int> GetChoreCompletionLimitAsync(int choreId, string userId)
-        {
-            var chore = await _db.Chores.FindAsync(choreId);
-            if (chore == null || chore.UserId != userId)
+            // reward gold when quest is fully completed for the week
+            var firstDateOfWeek = DateTime.UtcNow.StartOfWeek();
+            var lastDateOfWeek = DateTime.UtcNow.EndOfWeek();
+            if (chore.Completions.Count(c => c.CompletionDate >= firstDateOfWeek && c.CompletionDate <= lastDateOfWeek) == chore.TimesAWeek)
             {
-                return 0;
+                var goldManager = new GoldManager(_db, userId);
+                await goldManager.AddGoldAsync(chore.Gold);
             }
-
-            var user = await _db.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return 0;
-            }
-
-            return chore.TimesAWeek;
-        }
-
-        public int CalculateLevel(int totalXp)
-        {
-            return (int)Math.Floor(Math.Sqrt(totalXp) * 0.5);
         }
     }
 }

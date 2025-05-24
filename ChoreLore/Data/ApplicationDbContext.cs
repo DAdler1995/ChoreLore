@@ -8,5 +8,6 @@ namespace ChoreLore.Data
     {
         public DbSet<Chore> Chores { get; set; }
         public DbSet<ChoreCompletion> ChoreCompletions { get; set; }
+        public DbSet<AccountStatistics> AccountStatistics { get; set; }
     }
 }
