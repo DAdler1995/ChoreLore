@@ -5,10 +5,10 @@ namespace ChoreLore.Models
     public class Chore
     {
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public required string SimpleName { get; set; }
-        public required int TimesAWeek { get; set; }
-        public required int Gold { get; set; }
+        public string Name { get; set; }
+        public string SimpleName { get; set; }
+        public int TimesAWeek { get; set; }
+        public int Gold { get; set; }
         public string Description { get; set; } = "";
 
         public string? UserId { get; set; }

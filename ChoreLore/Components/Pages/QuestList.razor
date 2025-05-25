@@ -2,12 +2,12 @@
 
 @using ChoreLore.Data
 @using ChoreLore.Models.ViewModels
+@using ChoreLore.Services
 @using Microsoft.AspNetCore.Identity
-@using Services.Interfaces
 @using Models
 @using System.Diagnostics
 
-@inject IChoreService ChoreService
+@inject ChoreService ChoreService
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
