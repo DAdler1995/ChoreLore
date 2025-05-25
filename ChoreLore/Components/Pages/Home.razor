@@ -9,27 +9,35 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject AccountStatisticService AccountStatisticService
 
-<PageTitle>Home</PageTitle>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <PageTitle>Home</PageTitle>
 
-<h1>Welcome to Chore Lore!</h1>
-<h2>Track your chores, earn gold, and spend it on rewards!</h2>
+            <h1>Welcome to Chore Lore!</h1>
+            <h2>Track your chores, earn gold, and spend it on rewards!</h2>
+        </div>
+    </div>
 
-<div class="container mt-4">
-    @if (user is null)
-    {
-        <p>Please login to view your stats.</p>
-        <a class="btn btn-outline-primary" href="Account/Login">Login!</a>
-    }
-    else
-    {
-        <h3>Hello, @user.UserName!</h3>
-        <p>Current Gold: @user.TotalGold</p>
-        @* <p>Total Quests Completed: @stats?.TotalQuestsCompleted ?? 0</p> *@
-        <p>Total Gold Earned: @stats?.TotalGoldEarned</p>
-}
+    <div class="row">
+        <div class="col">
+
+            @if (user == null)
+            {
+                <p>Please login to view your stats.</p>
+                <a class="btn btn-outline-primary" href="Account/Login">Login!</a>
+            }
+            else
+            {
+                <h3>Hello, @user.UserName!</h3>
+                <p>Current Gold: @user.TotalGold</p>
+                @* <p>Total Quests Completed: @stats?.TotalQuestsCompleted ?? 0</p> *@
+                <p>Total Gold Earned: @stats?.TotalGoldEarned</p>
+            }
+
+        </div>
+    </div>
 </div>
-
-
 
 @code
 {
