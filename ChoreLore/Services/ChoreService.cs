@@ -2,13 +2,11 @@
 using ChoreLore.Extensions;
 using ChoreLore.Models;
 using ChoreLore.Models.ViewModels;
-using ChoreLore.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace ChoreLore.Services
 {
-    public class ChoreService : IChoreService
+    public class ChoreService
     {
         private readonly ApplicationDbContext _db;
 
@@ -71,6 +69,12 @@ namespace ChoreLore.Services
                 var goldManager = new GoldManager(_db, userId);
                 await goldManager.AddGoldAsync(chore.Gold);
             }
+        }
+
+        public async Task CreateChoreAsync(Chore newChore)
+        {
+            _db.Chores.Add(newChore);
+            await _db.SaveChangesAsync();
         }
     }
 }
